@@ -3,22 +3,27 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from products.models import Product, ProductCategory, Basket
 from users.models import User
-
+from django.core.paginator import Paginator
 
 def index(request):
     context = {"title": "Store"}
     return render(request, "products/index.html", context)
 
 
-def products(request):
-    products = Product.objects.all()
+def products(request, category_id=None, page_number=1):
+    products = (
+        Product.objects.filter(category_id=category_id)
+        if category_id
+        else Product.objects.all()
+    )
+    per_page = 3
+    paginator = Paginator(products, per_page)
+    products_paginator = paginator.page(page_number)
+
     categories = ProductCategory.objects.all()
-    context = {
-        "title": "Store-Каталог",
-        "products": products,
-        "categories": categories,
-    }
+    context = {"title": "Store-Каталог", "categories": categories, "products": products_paginator}
     return render(request, "products/products.html", context)
+
 
 @login_required
 def basket_add(request, product_id):
@@ -33,6 +38,7 @@ def basket_add(request, product_id):
         basket.save()
 
     return redirect(request.META["HTTP_REFERER"])
+
 
 @login_required
 def basket_remove(request, basket_id):

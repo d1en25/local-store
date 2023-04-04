@@ -5,6 +5,7 @@ from django.contrib import auth, messages
 from products.models import Basket
 from django.contrib.auth.decorators import login_required
 
+
 def login(request):
     if request.method == "POST":
         form = UserLoginForm(data=request.POST)
@@ -34,6 +35,7 @@ def registration(request):
         form = UserRegistrationForm()
     context = {"title": "Store-Регистрация", "form": form}
     return render(request, "users/registration.html", context)
+
 
 @login_required
 def profile(request):
