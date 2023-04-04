@@ -5,12 +5,13 @@ from products.models import Product, ProductCategory, Basket
 from users.models import User
 from django.core.paginator import Paginator
 
+
 def index(request):
     context = {"title": "Store"}
     return render(request, "products/index.html", context)
 
 
-def products(request, category_id=None, page_number=1):
+def products(request, category_id=None):
     products = (
         Product.objects.filter(category_id=category_id)
         if category_id
@@ -18,10 +19,15 @@ def products(request, category_id=None, page_number=1):
     )
     per_page = 3
     paginator = Paginator(products, per_page)
-    products_paginator = paginator.page(page_number)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     categories = ProductCategory.objects.all()
-    context = {"title": "Store-Каталог", "categories": categories, "products": products_paginator}
+    context = {
+        "title": "Store-Каталог",
+        "categories": categories,
+        "page_obj" : page_obj,
+    }
     return render(request, "products/products.html", context)
 
 
