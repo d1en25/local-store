@@ -37,9 +37,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
+    
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    'allauth.socialaccount.providers.github',
+    
     "products",
     "users",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -64,7 +72,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                'products.context_processors.baskets'
+                "products.context_processors.baskets",
             ],
         },
     },
@@ -78,8 +86,12 @@ WSGI_APPLICATION = "store.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "store_db",
+        "USER": "store_username",
+        "PASSWORD": "store_password",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
@@ -150,3 +162,20 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = "sdemianenko15@gmail.com"
 EMAIL_HOST_PASSWORD = "oizxgkrniozrfruk"
 EMAIL_USE_TLS = True
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+SITE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': [
+            'user',
+            'repo',
+            'read:org',
+        ],
+    }
+}
