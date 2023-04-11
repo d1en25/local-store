@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
+from django.core.cache import cache
 
 from users.models import User
 from products.models import Product, ProductCategory, Basket
@@ -14,10 +15,11 @@ class IndexView(TitleMixin, TemplateView):
     title = "Store"
 
 
-class ProductsListView(ListView):
+class ProductsListView(TitleMixin, ListView):
     model = Product
     template_name = "products/products.html"
     paginate_by = 3
+    title = "Store-Каталог"
 
     def get_queryset(self):
         queryset = super(ProductsListView, self).get_queryset()
@@ -26,8 +28,12 @@ class ProductsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductsListView, self).get_context_data(**kwargs)
-        context["title"] = "Store-Каталог"
-        context["categories"] = ProductCategory.objects.all()
+        categories = cache.get("categories")
+        if not categories:
+            context["categories"] = ProductCategory.objects.all()
+            cache.set("categories", context["categories"], 30)
+        else:
+            context["categories"] = categories
         return context
 
 
